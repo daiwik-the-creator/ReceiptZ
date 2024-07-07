@@ -11,7 +11,8 @@ class Receipt {
         string owner;
         vector<pair<string,double>> people;
         vector<Item> items;
-        double discount;
+        double discount_factor;
+        double total;
 
         void createReceipt() {
             cout << "called";
@@ -42,6 +43,37 @@ class Receipt {
 
         }
 
+        void setDiscount() {
+            while (true) {
+                cout << "Enter discount type % / $: ";
+
+                string input;
+                getline(cin, input);
+
+                if (input == "%") {
+                    cout << "Enter %";
+                    getline(cin, input);
+                    double discount_percent = stod(input);
+                    double discount_price = subtotal() * (discount_percent / 100); // Converts % to $ discount
+                    cout << "discount price" << discount_price;
+                    total = subtotal() - discount_price; // Gets total by removing discount $
+                    break;
+                }
+                else if (input == "$") {
+                    cout << "Enter $";
+                    getline(cin, input);
+                    total = subtotal() - stod(input); // Gets total by removing discount $
+                    break;
+                }
+                else {
+                    cout << "Invalid Input! Enter % / $";
+                }
+            }
+
+            discount_factor = total / subtotal();
+
+        }
+
         int setItem() {
             cout << "Enter (item, price) or type 'x' to finish: ";
 
@@ -49,7 +81,7 @@ class Receipt {
             getline(cin, input);
             
             if (input == "x") {
-                cout << "bye" << "\n";
+                cout << "Item Data Aquired..." << "\n";
                 return 0;
             }
 
@@ -106,14 +138,40 @@ class Receipt {
         void calculate() {
             auto start = chrono::high_resolution_clock::now();
 
-            int splitTo = people.size() + 1;
-            cout << "people size " << splitTo << "\n";
             vector < pair < string, double >> debtors = people;
 
             for (const Item& item : items) {
-                double split = item.price / splitTo;
+
+                double discounted_price = item.price * discount_factor;
+
+                int splitTo = people.size() + 1;
+
+                // Exclude payees
+                for (auto& person: debtors) {
+                    for (auto& excludee: item.exclude_people) {
+                        if (person.first == excludee) {
+                            splitTo--;
+                            break;
+                        };
+                    }
+                }
+
+                double share = discounted_price / splitTo;
+
+                bool pays;
                 for (auto& person : debtors) {
-                    person.second += split;
+                    pays = true;
+
+                    for (auto& excludee : item.exclude_people) {
+                        if (person.first == excludee) {
+                            pays = false;
+                            break;
+                        }
+                    }
+
+                    if (pays == true) {
+                        person.second += share;
+                    }
                 }
             }
 
@@ -129,9 +187,5 @@ class Receipt {
                 cout << person.first << " owes $" << person.second << " to " << owner << "\n";
             }
         }
-
-        //void setDiscount(double ) {
-        //    double discount
-        //}
 
 };

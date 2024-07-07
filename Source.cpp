@@ -9,28 +9,27 @@ using namespace std;
 // Needs: Exclude people option
 
 int main() {
-   cout << "ReceiptZ P.O.C." << "\n\n";
+    cout << "ReceiptZ P.O.C." << "\n\n";
 
-   Receipt receipt;
-   receipt.setOwner();
-   receipt.setPayees();
+    Receipt receipt;
+    receipt.setOwner();
+    receipt.setPayees();
 
-   while (true) {
+    while (true) {
+        bool r = receipt.setItem();
+        if (r != 1) {
+            break;
+        }
+    }
 
-       bool r = receipt.setItem();
-       if (r != 1) {
-           break;
-       }
+    receipt.setDiscount();
 
-   }
+    receipt.read();
+    cout << "Subtotal: $" << receipt.subtotal() << "\n";
+    cout << "Total (Discount Applied): $" << receipt.total << "\n";
 
-   receipt.read();
+    receipt.calculate();
+    receipt.debtors();
 
-   cout << "Subtotal: $" << receipt.subtotal() << "\n";
-
-   receipt.calculate();
-   receipt.debtors();
-
-
-	return 0;
+    return 0;
 }
