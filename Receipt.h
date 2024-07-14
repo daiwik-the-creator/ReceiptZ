@@ -3,6 +3,7 @@
 #include <string>
 #include <chrono>
 #include <map>
+#include <cmath>
 #include "Item.h"
 using namespace std;
 
@@ -13,10 +14,8 @@ class Receipt {
         vector<Item> items;
         double discount_factor;
         double total;
-
-        void createReceipt() {
-            cout << "called";
-        }
+        
+        
 
         void setOwner() {
             cout << "Who paid?: ";
@@ -55,7 +54,7 @@ class Receipt {
                     getline(cin, input);
                     double discount_percent = stod(input);
                     double discount_price = subtotal() * (discount_percent / 100); // Converts % to $ discount
-                    cout << "discount price" << discount_price;
+                    
                     total = subtotal() - discount_price; // Gets total by removing discount $
                     break;
                 }
@@ -116,6 +115,7 @@ class Receipt {
         }
 
         void read() {
+            cout.precision(3);
             for (const auto& item : items) {
                 cout << "Item: " << item.name << " ";
                 cout << "$" << item.price << " ";
@@ -144,7 +144,15 @@ class Receipt {
 
                 double discounted_price = item.price * discount_factor;
 
+                // Handle owner exclusion better 
                 int splitTo = people.size() + 1;
+
+                for (auto& excludee : item.exclude_people) {
+                    if (excludee == owner) {
+                        splitTo--;
+                        break;
+                    }
+                }
 
                 // Exclude payees
                 for (auto& person: debtors) {

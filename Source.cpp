@@ -9,7 +9,7 @@ using namespace std;
 // Needs: Exclude people option
 
 int main() {
-    cout << "ReceiptZ P.O.C." << "\n\n";
+    cout << "ReceiptZ P.O.C." << "\n\n"; 
 
     Receipt receipt;
     receipt.setOwner();
